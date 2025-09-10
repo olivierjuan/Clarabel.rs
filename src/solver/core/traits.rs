@@ -247,6 +247,8 @@ pub trait Solution<T: FloatT> {
         settings: &Self::SE,
     );
 
+    fn set_iterations(&mut self, iters: i32);
+
     /// finalize the solution, e.g. extract final timing from info
     fn finalize(&mut self, info: &Self::I);
 }

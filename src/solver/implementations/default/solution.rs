@@ -122,6 +122,10 @@ where
         }
     }
 
+    fn set_iterations(&mut self, iters: i32) {
+        self.iterations = if iters < 0 { std::u32::MAX } else { iters as u32 };
+    }
+
     fn finalize(&mut self, info: &DefaultInfo<T>) {
         self.solve_time = info.solve_time;
     }

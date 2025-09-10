@@ -274,6 +274,7 @@ where
         self.solutions.clear();
         self.copy_variables.copy_from(&self.variables);
         self.tmp_solution.post_process(&self.data, &mut self.copy_variables, &self.info, &self.settings);
+        self.tmp_solution.set_iterations(-1); // mark initial point with -1
         self.solutions.push(self.tmp_solution.clone());
 
         timeit!{timers => "IP iteration"; {
@@ -460,6 +461,9 @@ where
         timeit! {timers => "post-process"; {
             //check for "almost" convergence case and then extract solution
             self.info.post_process(&self.residuals, &self.settings);
+            self.copy_variables.copy_from(&self.variables);
+            self.tmp_solution.post_process(&self.data, &mut self.copy_variables, &self.info, &self.settings);
+            self.solutions.push(self.tmp_solution.clone());
             self.solution
                 .post_process(&self.data, &mut self.variables, &self.info, &self.settings);
         }}
