@@ -24,7 +24,7 @@ pub struct DefaultSolution<T> {
     /// solve time in seconds
     pub solve_time: f64,
     /// number of iterations
-    pub iterations: u32,
+    pub iterations: i32,
     /// primal residual
     pub r_prim: T,
     /// dual residual
@@ -123,7 +123,7 @@ where
     }
 
     fn set_iterations(&mut self, iters: i32) {
-        self.iterations = if iters < 0 { std::u32::MAX } else { iters as u32 };
+        self.iterations = iters; //if iters < 0 { std::u32::MAX } else { iters as u32 };
     }
 
     fn finalize(&mut self, info: &DefaultInfo<T>) {

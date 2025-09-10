@@ -100,7 +100,7 @@ pub struct PyDefaultInfo {
     #[pyo3(get)]
     pub step_length: f64,
     #[pyo3(get)]
-    pub iterations: u32,
+    pub iterations: i32,
     #[pyo3(get)]
     pub cost_primal: f64,
     #[pyo3(get)]
@@ -190,7 +190,7 @@ pub struct PyDefaultSolution {
     #[pyo3(get)]
     pub solve_time: f64,
     #[pyo3(get)]
-    pub iterations: u32,
+    pub iterations: i32,
     #[pyo3(get)]
     pub r_prim: f64,
     #[pyo3(get)]

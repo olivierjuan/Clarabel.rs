@@ -205,7 +205,7 @@ where
     );
 
     /// Return `true` if termination conditions have been reached.
-    fn check_termination(&mut self, residuals: &Self::R, settings: &Self::SE, iter: u32) -> bool;
+    fn check_termination(&mut self, residuals: &Self::R, settings: &Self::SE, iter: i32) -> bool;
 
     /// save a prior iterate
     fn save_prev_iterate(&mut self, variables: &Self::V, prev_variables: &mut Self::V);
@@ -215,7 +215,7 @@ where
     /// Record some of the top level solver's choice of various
     /// scalars. `μ = ` normalized gap.  `α = ` computed step length.
     /// `σ = ` multiplier for the updated centering parameter.
-    fn save_scalars(&mut self, μ: T, α: T, σ: T, iter: u32);
+    fn save_scalars(&mut self, μ: T, α: T, σ: T, iter: i32);
 
     /// Report the termination status
     fn get_status(&self) -> SolverStatus;

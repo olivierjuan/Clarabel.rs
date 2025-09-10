@@ -244,7 +244,7 @@ where
 {
     fn solve(&mut self) {
         // various initializations
-        let mut iter: u32 = 0;
+        let mut iter: i32 = 0;
         let mut σ = T::one();
         let mut α = T::zero();
         let mut μ;

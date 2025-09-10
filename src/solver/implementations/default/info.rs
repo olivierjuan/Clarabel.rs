@@ -18,7 +18,7 @@ pub struct DefaultInfo<T> {
     /// step length for the current iteration
     pub step_length: T,
     /// number of iterations
-    pub iterations: u32,
+    pub iterations: i32,
     /// primal objective value
     pub cost_primal: T,
     /// dual objective value
@@ -185,7 +185,7 @@ where
         &mut self,
         residuals: &DefaultResiduals<T>,
         settings: &DefaultSettings<T>,
-        iter: u32,
+        iter: i32,
     ) -> bool {
         //  optimality or infeasibility
         // ---------------------
@@ -194,7 +194,7 @@ where
         //  poor progress
         // ----------------------
         if self.status == SolverStatus::Unsolved
-            && iter > 1u32
+            && iter > 1
             && (self.res_dual > self.prev_res_dual || self.res_primal > self.prev_res_primal)
         {
             // Poor progress at high tolerance.
@@ -221,7 +221,7 @@ where
         // time or iteration limits
         // ----------------------
         if self.status == SolverStatus::Unsolved {
-            if settings.max_iter == self.iterations {
+            if settings.max_iter as i32 == self.iterations {
                 self.status = SolverStatus::MaxIterations;
             } else if self.solve_time > settings.time_limit {
                 self.status = SolverStatus::MaxTime;
@@ -254,7 +254,7 @@ where
         variables.copy_from(prev_variables);
     }
 
-    fn save_scalars(&mut self, μ: T, α: T, σ: T, iter: u32) {
+    fn save_scalars(&mut self, μ: T, α: T, σ: T, iter: i32) {
         self.mu = μ;
         self.step_length = α;
         self.sigma = σ;

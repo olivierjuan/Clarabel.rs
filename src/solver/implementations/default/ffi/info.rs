@@ -10,7 +10,7 @@ pub struct DefaultInfoFFI<T> {
     pub mu: T,
     pub sigma: T,
     pub step_length: T,
-    pub iterations: u32,
+    pub iterations: i32,
     pub cost_primal: T,
     pub cost_dual: T,
     pub res_primal: T,
