@@ -51,7 +51,6 @@ try:
         assert settings.warm_start_kappa == 0.5
         
         print("✓ All warm start settings tests passed!")
-        return True
         
     def test_simple_warm_start():
         """Test basic warm start functionality."""
@@ -106,7 +105,6 @@ try:
         print(f"  Cold start iterations: {sol1.iterations}")
         print(f"  Warm start iterations: {sol2.iterations}")
         print(f"  Warm start used: {sol2.warm_start_used}")
-        return True
     
     if __name__ == "__main__":
         print("Testing Clarabel Python warm start bindings...")
