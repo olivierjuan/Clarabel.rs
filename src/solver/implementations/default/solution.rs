@@ -33,6 +33,8 @@ pub struct DefaultSolution<T> {
     pub tau: T,
     /// κ (homogenization parameter)  
     pub kappa: T,
+    /// final μ (barrier parameter) value
+    pub mu: T,
     /// whether warm start was used successfully
     pub warm_start_used: bool,
 }
@@ -60,6 +62,7 @@ where
             r_dual: T::nan(),
             tau: T::one(),
             kappa: T::one(),
+            mu: T::nan(),
             warm_start_used: false,
         }
     }
@@ -97,6 +100,7 @@ where
         self.r_dual = info.res_dual;
         self.tau = variables.τ;
         self.kappa = variables.κ;
+        self.mu = info.mu;
         self.warm_start_used = info.warm_start_used;
 
         // unscale the variables to get a solution
