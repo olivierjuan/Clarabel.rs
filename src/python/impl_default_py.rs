@@ -200,6 +200,8 @@ pub struct PyDefaultSolution {
     #[pyo3(get)]
     pub kappa: f64,
     #[pyo3(get)]
+    pub mu: f64,
+    #[pyo3(get)]
     pub warm_start_used: bool,
 }
 
@@ -222,6 +224,7 @@ impl From<&DefaultSolution<f64>> for PyDefaultSolution {
             r_dual: result.r_dual,
             tau: result.tau,
             kappa: result.kappa,
+            mu: result.mu,
             warm_start_used: result.warm_start_used,
         }
     }
@@ -263,6 +266,7 @@ impl Debug for PyDefaultSolution {
             .field("obj_val_dual", &self.obj_val_dual)
             .field("solve_time", &self.solve_time)
             .field("iterations", &self.iterations)
+            .field("mu", &self.mu)
             .field("r_prim", &self.r_prim)
             .field("r_dual", &self.r_dual)
             .finish()

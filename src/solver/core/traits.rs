@@ -246,7 +246,7 @@ pub trait Solution<T: FloatT> {
         info: &Self::I,
         settings: &Self::SE,
     );
-
+    /// Set the number of iterations taken to solve
     fn set_iterations(&mut self, iters: i32);
 
     /// finalize the solution, e.g. extract final timing from info
