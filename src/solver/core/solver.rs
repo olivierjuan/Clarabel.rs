@@ -309,6 +309,10 @@ where
                 &self.variables,
                 &self.residuals,&timers);
 
+            self.copy_variables.copy_from(&self.variables);
+            self.tmp_solution.post_process(&self.data, &mut self.copy_variables, &self.info, &self.settings);
+            self.solutions.push(self.tmp_solution.clone());
+            
             notimeit!{timers; {
                 self.info.print_status(&self.settings).unwrap();
             }}
@@ -439,9 +443,9 @@ where
             self.info.save_prev_iterate(&self.variables,&mut self.prev_vars);
 
             self.variables.add_step(&self.step_lhs, α);
-            self.copy_variables.copy_from(&self.variables);
-            self.tmp_solution.post_process(&self.data, &mut self.copy_variables, &self.info, &self.settings);
-            self.solutions.push(self.tmp_solution.clone());
+            //self.copy_variables.copy_from(&self.variables);
+            //self.tmp_solution.post_process(&self.data, &mut self.copy_variables, &self.info, &self.settings);
+            //self.solutions.push(self.tmp_solution.clone());
 
         } //end loop
         // ----------
