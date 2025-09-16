@@ -22,12 +22,12 @@ def create_qp_problem():
     P = sparse.csc_matrix([[2., 0.], [0., 2.]])
     q = np.array([0., 0.])
     
-    # Only inequality constraints: x >= 0, x <= [2, 2]
+    # Only inequality constraints:
     A = sparse.csc_matrix([
-        [1., 0.],    # x[0] >= 0 (will be x[0] <= inf)
-        [0., 1.],    # x[1] >= 0 (will be x[1] <= inf)
-        [-1., 0.],   # x[0] <= 2 (will be -x[0] <= -2, so x[0] >= 2, wait...)
-        [0., -1.]    # x[1] <= 2
+        [1., 0.],    # x[0] <= 2
+        [0., 1.],    # x[1] <= 2
+        [-1., 0.],   # -x[0] <= -1/2
+        [0., -1.]    # -x[1] <= -1/2
     ])
     b = np.array([2., 2., -0.5, -0.5])  # x <= [2,2] and x >= [0.5, 0.5]
     

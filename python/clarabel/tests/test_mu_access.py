@@ -167,6 +167,87 @@ try:
         assert relative_error < 1e-10, f"Final mu values should match: {final_mu_single:.10e} vs {final_mu_all:.10e} (relative error: {relative_error:.2e})"
         
         print(f"✓ Mu consistency test passed! (relative error: {relative_error:.2e})")
+
+    def test_mu_formula_verification():
+        """Test that mu = (s.dot(z) + kappa*tau)/(cone.degree + 1) for feasible solutions."""
+        
+        # Create a simple QP problem
+        from scipy import sparse
+        
+        P = sparse.csc_matrix([[2.0, 0.0], [0.0, 2.0]])
+        q = np.array([0.0, 0.0])
+        
+        A = sparse.csc_matrix([
+            [1., 0.],    # x >= 0
+            [0., 1.],    # y >= 0
+            [1., 1.]     # x + y >= 1
+        ])
+        b = np.array([0.0, 0.0, 1.0])
+        cones = [clarabel.NonnegativeConeT(3)]
+        
+        # Calculate total cone degree
+        # For NonnegativeConeT, degree = cone dimension
+        total_cone_degree = cones[0].dim
+        
+        # Solve with solve_all_iterations()
+        settings = clarabel.DefaultSettings()
+        settings.verbose = False
+        solver = clarabel.DefaultSolver(P, q, A, b, cones, settings)
+        all_solutions = solver.solve_all_iterations()
+        
+        print(f"✓ Testing mu formula for {len(all_solutions)} solutions")
+        
+        feasible_count = 0
+        for i, solution in enumerate(all_solutions):
+            # Only check for solutions with iteration >= 0 and that are not infeasible
+            if solution.iterations >= 0 and solution.status not in [
+                clarabel.SolverStatus.PrimalInfeasible, 
+                clarabel.SolverStatus.DualInfeasible,
+                clarabel.SolverStatus.AlmostPrimalInfeasible,
+                clarabel.SolverStatus.AlmostDualInfeasible
+            ]:
+                feasible_count += 1
+                
+                # Calculate s.dot(z)
+                s_dot_z = np.dot(solution.s, solution.z)
+                
+                # Calculate expected mu using the formula: (s.dot(z) + kappa*tau)/(cone.degree + 1)
+                expected_mu = (s_dot_z + solution.kappa * solution.tau) / (total_cone_degree + 1)
+                
+                # Get actual mu from solution
+                actual_mu = solution.mu
+                
+                # Allow for small numerical differences
+                if expected_mu == 0.0 and actual_mu == 0.0:
+                    relative_error = 0.0
+                else:
+                    abs_error = abs(actual_mu - expected_mu)
+                    relative_error = abs_error / max(abs(expected_mu), abs(actual_mu), 1e-16)
+                
+                # Print details for first few solutions
+                if i < 5:
+                    print(f"  Solution {i+1}: iteration={solution.iterations}, status={solution.status}")
+                    print(f"    s.dot(z) = {s_dot_z:.10e}")
+                    print(f"    kappa*tau = {solution.kappa * solution.tau:.10e}")
+                    print(f"    cone_degree + 1 = {total_cone_degree + 1}")
+                    print(f"    Expected mu = {expected_mu:.10e}")
+                    print(f"    Actual mu = {actual_mu:.10e}")
+                    print(f"    Relative error = {relative_error:.2e}")
+                
+                # Check that the formula holds with reasonable tolerance
+                assert relative_error < 1e-10, (
+                    f"Solution {i+1}: mu formula verification failed!\n"
+                    f"  Expected: {expected_mu:.10e}\n"
+                    f"  Actual: {actual_mu:.10e}\n"
+                    f"  Relative error: {relative_error:.2e}\n"
+                    f"  s.dot(z): {s_dot_z:.10e}\n"
+                    f"  kappa*tau: {solution.kappa * solution.tau:.10e}\n"
+                    f"  cone_degree + 1: {total_cone_degree + 1}"
+                )
+        
+        print(f"✓ Mu formula verification passed for {feasible_count} feasible solutions!")
+        print(f"  Formula: mu = (s.dot(z) + kappa*tau)/(cone.degree + 1)")
+        print(f"  All solutions satisfied the formula within tolerance 1e-10")
     
     if __name__ == "__main__":
         print("Testing Clarabel Python mu access functionality...")
@@ -177,7 +258,10 @@ try:
             test_mu_access_all_iterations()
             print()
             test_mu_consistency()
+            print()
+            test_mu_formula_verification()
             print("\n🎉 All mu access tests passed! Both solve() and solve_all_iterations() properly expose mu values.")
+            print("✅ Mu formula verification confirmed: mu = (s.dot(z) + kappa*tau)/(cone.degree + 1)")
         except Exception as e:
             print(f"\n❌ Test failed: {e}")
             import traceback

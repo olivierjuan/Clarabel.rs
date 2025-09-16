@@ -4,7 +4,22 @@ use super::*;
 use crate::{
     algebra::*,
     solver::core::{traits::Solution, SolverStatus},
+    solver::SupportedConeT,
 };
+
+/// Calculate the degree of a SupportedConeT
+fn cone_degree<T: FloatT>(cone: &SupportedConeT<T>) -> usize {
+    match cone {
+        SupportedConeT::ZeroConeT(_) => 0,
+        SupportedConeT::NonnegativeConeT(dim) => *dim,
+        SupportedConeT::SecondOrderConeT(_) => 1,
+        SupportedConeT::ExponentialConeT() => 3,
+        SupportedConeT::PowerConeT(_) => 3,
+        SupportedConeT::GenPowerConeT(α, _) => α.len() + 1,
+        #[cfg(feature = "sdp")]
+        SupportedConeT::PSDTriangleConeT(dim) => *dim,
+    }
+}
 
 /// Standard-form solver type implementing the [`Solution`](crate::solver::core::traits::Solution) trait
 #[derive(Debug, Clone)]
@@ -98,14 +113,17 @@ where
         self.iterations = info.iterations;
         self.r_prim = info.res_primal;
         self.r_dual = info.res_dual;
-        self.tau = variables.τ;
-        self.kappa = variables.κ;
-        self.mu = info.mu;
         self.warm_start_used = info.warm_start_used;
 
         // unscale the variables to get a solution
         // to the internal problem as we solved it
         variables.unscale(data, is_infeasible);
+        self.tau = variables.τ;
+        self.kappa = variables.κ; 
+        // now get the right mu using the unscaled variables
+        let total_degree = data.cones.iter().map(|cone| cone_degree(cone)).sum::<usize>();
+        let denom = T::from(total_degree + 1).unwrap();
+        self.mu = (variables.s.dot(&variables.z) + self.tau * self.kappa) / denom;
 
         // unwind the chordal decomp and presolve, in the
         // reverse of the order in which they were applied
